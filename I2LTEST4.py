@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 from matplotlib import pyplot as plt
-image = cv.imread('/home/pi/Desktop/ScannerDev/TestImage.png', cv.IMREAD_GRAYSCALE)
+image = cv.imread('TestImage.png', cv.IMREAD_GRAYSCALE)
 newImage = image.copy()
 
 
@@ -36,22 +36,20 @@ print 'Length: ', len(contour)
 zVal = 1
 length = len(contour)
 
-allPoints = np.zeros((0,3))
-print 'Shape: ', allPoints.shape
-print 'Data type: ', allPoints.dtype
+allPoints = []
 
-
-for i in contour:
-    xVal, yVal = tuple(contour[0][0])
+for point in contour:
+    xVal, yVal = tuple(point[0])
     """allPoints[i][0] = float(xVal)
     allPoints[i][1] = float(yVal)
     allPoints[i][2] = float(zVal)"""
-    Point = np.array([float(xVal), float(yVal), float(zVal)])
+    point3D = (float(xVal), float(yVal), float(zVal))
     
-    np.append(allPoints, Point, axis = 0)
+    allPoints.append(point3D)
     
     
-print allPoints
+print np.array(allPoints)
+
 
 
 
