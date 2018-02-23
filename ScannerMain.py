@@ -71,8 +71,9 @@ def checkStartButton():
 #-----------------------------------    MOTION SETUP    ----------------------------------------#
 
 position = 0				# Current position of laser (mm from left)
+numMoves = 0
 MAXTRAVEL = 315				# User-settable scanning length (mm)  [320mm - 5 for homing allowance]
-RESOLUTION = 1				# Distance between photographed layers
+RESOLUTION = 1				# Distance between photographed layers (mm)
 
 
 
@@ -130,10 +131,11 @@ def normalOperation
 		home()										# Home the carriage
 		GPIO.output(lasers, HIGH)					# Turn on lasers
 		for position in MAXTRAVEL:
-			takePhoto (1, position)
-			takePhoto (2, position)
+			takePhoto (1, numMoves)
+			takePhoto (2, numMoves)
 			move (RESOLUTION, right)
 			position = position + RESOLUTION
+			numMoves = numMoves + 1
 		GPIO.output(lasers, LOW)					# Turn lasers off
 		home()										# Home back to zero
 		startBtnPressed = False						# End process so may be redone
