@@ -47,6 +47,7 @@ def imageToPoints(image):
         allPoints[i][2] = float(zVal)"""
         if xVal > 3:
         # Skip top line of the image (white values written previously)
+            global zVal
             point3D = (float(xVal), float(yVal), float(zVal))
     
             allPoints.append(point3D)
@@ -56,6 +57,7 @@ def imageToPoints(image):
     
 def imagesToList(pathToImages):
 # Iterates through directory and processes each image into array
+    global zVal
     for img in os.listdir(pathToImages):
         # Filters out any rogue files (e.g. hidden)
         if img.endswith(".png"):
