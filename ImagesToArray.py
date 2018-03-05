@@ -17,7 +17,7 @@ DIRECTORY = '/home/pi/Desktop/ScannerDev/'
 zVal = 0            # Third dimension of all points in image
 allPoints = []      # List of all points in all images
 filteredPoints = [] # List of points when duplicates removed
-numMoves = 0        # FOR EXAMPLE
+resolution = 1      # FOR EXAMPLE
 
 #---------------------    FUNCTION DEFINITIONS    ---------------------#
 
@@ -74,14 +74,14 @@ def imagesToList(pathToImages):
             if camNum == 1:
                 # Correction values here
                 
-                zVal = imgNum*numMoves
+                zVal = imgNum*resolution
                 imageToPoints(image)
                 
             
             else: #camNum == 2:
                 # Correction values here
             
-                zVal = imgNum*numMoves
+                zVal = imgNum*resolution
                 imageToPoints(image)
                 
             
