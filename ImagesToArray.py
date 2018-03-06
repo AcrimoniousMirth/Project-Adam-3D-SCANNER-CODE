@@ -9,7 +9,7 @@
 import cv2 as cv
 import numpy as np
 from matplotlib import pyplot as plt
-import math
+import time
 import os
 
 DIRECTORY = '/home/pi/Desktop/ScannerDev/'
@@ -99,15 +99,19 @@ def theCondition(xs,ys):
 def filterPoints(checkValues,condition):
     print (str(len(checkValues)) + ' points')
     print ('Removing duplicates...')
+    start = time.time()
     result = []
     i = 0
     for value in checkValues:
         i = i + 1
         print ('\rProcessing ' + str(i) + ' of ' + str(len(checkValues))),
         
-        if all(condition(value,other) for other in result):
+        if all(condition(value,other) for other in result if other[2] == value[2]):
             result.append(value)
-    print ('\n' + str(len(result)) + ' points remaining')
+    end = time.time()
+    timeElapsed = round(end - start)
+    print ('\nProcessed in ' + str(timeElapsed) + ' seconds')
+    print (str(len(result)) + ' points remaining')
     return result
 
 
