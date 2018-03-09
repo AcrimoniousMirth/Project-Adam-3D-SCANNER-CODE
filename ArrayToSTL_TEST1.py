@@ -18,6 +18,7 @@ from ImagesToArray import *
 
 
 
+
 if __name__ == '__main__':
 # For testing purposes
     pathToImages = DIRECTORY + 'TestPhotos/'
@@ -36,7 +37,7 @@ if __name__ == '__main__':
 
     hull = ConvexHull(points)
 
-    edges = zip(*points)
+    edges = list(zip(*points))
 
     # Simplices define the 3 points making up a triangle
     for simplex in hull.simplices:
