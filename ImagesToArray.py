@@ -17,12 +17,35 @@ DIRECTORY = '/home/pi/Desktop/ScannerDev/'
 zVal = 0            # Third dimension of all points in image
 allPoints = []      # List of all points in all images
 filteredPoints = [] # List of points when duplicates removed
-resolution = 1      # FOR EXAMPLE
+resolution = 1      # FOR EXAMPLE, from project global
+minSep = 83         # Dist between camera and laser at extremities
+maxTravel = 315     # Max distance laser can move
+xPixels = 640       # PROJECT GLOBAL
+yPixels = 480       # PROJECT GLOBAL
 
 #---------------------    FUNCTION DEFINITIONS    ---------------------#
 
 ### Image to list conversion                                           #
-def imageToPoints(image):
+def pointCorrection(xVal, yVal, zVal, camNum):
+# Correction for xy distortion on each layer 
+    global minSep, xPixels, yPixels
+    # Make centre of image 0,0
+    xVal = xVal - (xPixels/2)
+    yVal = yVal - (yPixels/2)
+    # Distortion for each camera is different for a shared plane
+    if camNum == 1:
+        xVal = xVal*((0.598*(minSep + zVal))/xPixels)
+        yVal = yVal*((0.445*(minSep + zVal))/yPixels)
+
+
+    if camNum == 2:
+        xVal = xVal*(0.598*(minSep + (maxTravel - zVal))/ xPixels)
+        yVal = yVal*(0.445*(minSep + (maxTravel - zVal))/ yPixels)
+        
+    return (xVal, yVal)
+
+
+def imageToPoints(image, camNum):
 # Takes an image and appends to allPoints list with given z value
     ret, discrImage = cv.threshold (image, 127, 255, 0)
     height, width = discrImage.shape
@@ -48,6 +71,9 @@ def imageToPoints(image):
         if xVal > 3:
         # Skip top line of the image (white values written previously)
             global zVal
+            # X and Y correction
+            xVal, yVal = pointCorrection(xVal, yVal, zVal, camNum)
+            
             point3D = (float(xVal), float(yVal), float(zVal))
     
             allPoints.append(point3D)
@@ -63,7 +89,7 @@ def imagesToList(pathToImages):
         if img.endswith(".png"):
             image = cv.imread(DIRECTORY + 'TestPhotos/' + img, cv.IMREAD_GRAYSCALE)
             #print image
-            if (image == None): 
+            if len(image) == 0: 
                 print(DIRECTORY+'TestPhotos/'+img, "could not be read!")
                 return # can't go on with an invalid image
             print ('Processing ' + img)
@@ -71,20 +97,8 @@ def imagesToList(pathToImages):
             camNum, imgNum = os.path.splitext(img)[0].split('img')
             # print 'Camera is ', camNum
             # print 'Image is ', imgNum
-        
-            # Correction of values will be different for cams 1 & 2
-            if camNum == 1:
-                # Correction values here
-                
-                zVal = imgNum*resolution
-                imageToPoints(image)
-                
-            
-            else: #camNum == 2:
-                # Correction values here
-            
-                zVal = imgNum*resolution
-                imageToPoints(image)
+            zVal = imgNum*resolution
+            imageToPoints(image, camNum)
                 
             
         else: print ('File ' + img +''' not of format [x]img[y].png''')
@@ -104,7 +118,7 @@ def filterPoints(checkValues,condition):
     i = 0
     for value in checkValues:
         i = i + 1
-        print ('\rProcessing ' + str(i) + ' of ' + str(len(checkValues))),
+        print ('\rProcessing ' + str(i) + ' of ' + str(len(checkValues)), end='')
         
         if all(condition(value,other) for other in result if other[2] == value[2]):
             result.append(value)
@@ -130,7 +144,7 @@ if __name__ == '__main__':
     print ('Extracting points from images...')
     filteredPoints = getPoints(pathToImages)
     
-    print np.array(filteredPoints)
+    print (np.array(filteredPoints))
     
     
     
