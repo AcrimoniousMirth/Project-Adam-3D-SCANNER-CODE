@@ -17,41 +17,13 @@ from scipy.spatial import ConvexHull
 # Import the array-creation functions
 from ImagesToArray import *
 
-
-
-
-if __name__ == '__main__':
-# For testing purposes
-    pathToImages = DIRECTORY + 'TestPhotos/'
-    
-    print ('Extracting points from images...')
-    filteredPoints = getPoints(pathToImages)
-    
-    #print np.array(filteredPoints)
-
-
-    # Array to STL
-    print ('Converting array to STL...')
-    points= np.array(filteredPoints)
-    hull = ConvexHull(points)
-    
-    '''
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    edges = list(zip(*points))
-    # Simplices define the 3 points making up a triangle
-    for simplex in hull.simplices:
-        plt.plot(points[simplex,0], points[simplex,1], points[simplex,2], 'r-')
-    ax.plot(edges[0],edges[1],edges[2],'bo') 
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.set_zlabel('z')
-    plt.show()
-    '''
-    
+#------------------------    FUNCTIONS    -----------------------------#
+def arrayToConvexHull(pointArray):
+# Array to STL
     # Vertices = points in array
     # Faces are defined by the corner points, listed in simplices
-    vertices = np.array(filteredPoints)
+    vertices = np.array(pointArray)
+    hull = ConvexHull(vertices)
     faces = np.array(hull.simplices)
 
     stlModel = mesh.Mesh(np.zeros(faces.shape[0], dtype=mesh.Mesh.dtype))
@@ -64,7 +36,31 @@ if __name__ == '__main__':
     print ('Saved to directory as "ScanData.stl"')
 
 
-#np.savetxt(DIRECTORY + 'points.txt', (points,faces), delimiter=',')
+def arrayToXYZ(pointArray):
+# Writes all points to local .xyz file
+    # Open (and write) new file in local directory
+    file = open("ScanData.xyz", "w")
+    
+    for point in pointArray:
+        xVal, yVal, zVal = point
+        file.write(str(xVal)+' '+str(yVal)+' '+str(zVal)+'\n')
+        
+    file.close()
+    print('Saved to directory as "ScanData.xyz"')
+
+
+if __name__ == '__main__':
+# For testing purposes
+    pathToImages = DIRECTORY + 'TestPhotos/'
+    
+    print ('Extracting points from images...')
+    filteredPoints = getPoints(pathToImages)
+
+    arrayToConvexHull(filteredPoints)
+    arrayToXYZ(filteredPoints)
+   
+
+
 
 
 
