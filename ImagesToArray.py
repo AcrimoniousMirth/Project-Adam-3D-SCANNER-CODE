@@ -14,7 +14,6 @@ import os
 
 DIRECTORY = '/home/pi/Desktop/ScannerDev/'
 
-zVal = 0            # Third dimension of all points in image
 allPoints = []      # List of all points in all images
 filteredPoints = [] # List of points when duplicates removed
 resolution = 1      # FOR EXAMPLE, from project global
@@ -22,6 +21,7 @@ minSep = 83         # Dist between camera and laser at extremities
 maxTravel = 315     # Max distance laser can move
 xPixels = 640       # PROJECT GLOBAL
 yPixels = 480       # PROJECT GLOBAL
+
 
 #---------------------    FUNCTION DEFINITIONS    ---------------------#
 
@@ -32,23 +32,23 @@ def pointCorrection(xVal, yVal, zVal, camNum):
     # Make centre of image 0,0
     xVal = xVal - (xPixels/2)
     yVal = yVal - (yPixels/2)
+    
     # Distortion for each camera is different for a shared plane
     if camNum == 1:
-        xVal = xVal*((0.598*(minSep + zVal))/xPixels)
-        yVal = yVal*((0.445*(minSep + zVal))/yPixels)
+        xVal = round((xVal*0.598*(minSep + zVal)/xPixels),3)
+        yVal = round((yVal*0.448*(minSep + zVal)/yPixels),3)
 
-
-    if camNum == 2:
-        xVal = xVal*(0.598*(minSep + (maxTravel - zVal))/ xPixels)
-        yVal = yVal*(0.445*(minSep + (maxTravel - zVal))/ yPixels)
+    elif camNum == 2:
+        xVal = round((xVal*0.598*(minSep + (maxTravel - zVal))/ xPixels),3)
+        yVal = round((yVal*0.448*(minSep + (maxTravel - zVal))/ yPixels),3)
         
     return (xVal, yVal)
 
 
-def imageToPoints(image, camNum):
+def imageToPoints(image, camNum, zVal):
 # Takes an image and appends to allPoints list with given z value
     ret, discrImage = cv.threshold (image, 127, 255, 0)
-    height, width = discrImage.shape
+    #height, width = discrImage.shape
     
     # Add a line of white values to the top of the image.
     # This ensures that the binary outer contour works.
@@ -68,9 +68,8 @@ def imageToPoints(image, camNum):
         """allPoints[i][0] = float(xVal)
         allPoints[i][1] = float(yVal)
         allPoints[i][2] = float(zVal)"""
-        if xVal > 3:
         # Skip top line of the image (white values written previously)
-            global zVal
+        if xVal > 3:
             # X and Y correction
             xVal, yVal = pointCorrection(xVal, yVal, zVal, camNum)
             
@@ -83,7 +82,7 @@ def imageToPoints(image, camNum):
     
 def imagesToList(pathToImages):
 # Iterates through directory and processes each image into array
-    global zVal
+    global resolution
     for img in os.listdir(pathToImages):
         # Filters out any rogue files (e.g. hidden)
         if img.endswith(".png"):
@@ -95,10 +94,11 @@ def imagesToList(pathToImages):
             print ('Processing ' + img)
 
             camNum, imgNum = os.path.splitext(img)[0].split('img')
-            # print 'Camera is ', camNum
-            # print 'Image is ', imgNum
+            camNum = int(camNum)
+            imgNum = int(imgNum)
             zVal = imgNum*resolution
-            imageToPoints(image, camNum)
+            
+            imageToPoints(image, camNum, zVal)
                 
             
         else: print ('File ' + img +''' not of format [x]img[y].png''')
@@ -141,10 +141,10 @@ if __name__ == '__main__':
 # For testing purposes
     pathToImages = DIRECTORY + 'TestPhotos/'
     
-    print ('Extracting points from images...')
+    print('Extracting points from images...')
     filteredPoints = getPoints(pathToImages)
     
-    print (np.array(filteredPoints))
+    print(np.array(filteredPoints))
     
     
     
