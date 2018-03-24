@@ -25,10 +25,10 @@ GPIO.setwarnings (False)						# Don't print GPIO warning messages
 lasers = 29										# Pin to which lasers are connected
 STEP = 31										# Pin to which STEP on driver is connected
 DIR = 33										# Pin to which DIR on driver is connected
-startBtn = 35									# Pin to which start button is connected
-endstop = 37									# Pin to which endstop is connected
-powerLED = 15									# Lights when operating
-workingLED = 13									# Lights when scanning begins until processing is complete
+startBtn = 36									# Pin to which start button is connected
+endstop = 35									# Pin to which endstop is connected
+powerLED = 38									# Lights when operating
+workingLED = 40									# Lights when scanning begins until processing is complete
 
 GPIO.setup (lasers, GPIO.OUT)
 GPIO.setup (STEP, GPIO.OUT)
